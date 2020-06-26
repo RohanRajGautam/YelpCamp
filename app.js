@@ -1,25 +1,46 @@
 const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const port = 3000;
+app = express(),
+  bodyParser = require('body-parser'),
+  port = 3000,
+  mongoose = require('mongoose');
 
+mongoose.connect('mongodb://localhost/yelp', { useNewUrlParser: true, useUnifiedTopology: true });
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs');
 
-//campground array
-let campgrounds = [
-  { name: 'Simon Creek', image: 'https://www.elacampground.com/wp-content/uploads/2019/06/Ela-Campground-74-768x513.jpg' },
-  { name: 'Tom Hank', image: 'https://media.gettyimages.com/photos/camping-in-a-tent-under-the-stars-and-milky-way-galaxy-picture-id904960682?s=2048x2048' },
-  { name: 'Robert Niro', image: 'https://media.gettyimages.com/photos/young-people-camping-with-a-baby-girl-picture-id627343204?s=2048x2048' },
-  { name: 'Simon Creek', image: 'https://www.elacampground.com/wp-content/uploads/2019/06/Ela-Campground-74-768x513.jpg' },
-  { name: 'Tom Hank', image: 'https://media.gettyimages.com/photos/camping-in-a-tent-under-the-stars-and-milky-way-galaxy-picture-id904960682?s=2048x2048' },
-  { name: 'Robert Niro', image: 'https://media.gettyimages.com/photos/young-people-camping-with-a-baby-girl-picture-id627343204?s=2048x2048' },
-]
+//Schema set up
+const campgroundSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+});
+
+let Campground = mongoose.model('Campground', campgroundSchema);
+
+// Campground.create(
+//   {
+//     name: 'Tom Hank',
+//     image: 'https://media.gettyimages.com/photos/camping-in-a-tent-under-the-stars-and-milky-way-galaxy-picture-id904960682?s=2048x2048',
+//   }, (err, campground) => {
+//     if (err) {
+//       console.log("SOMETHING WENT WRONG!")
+//     } else {
+//       console.log("NEW DATABASE ADDED");
+//       console.log(campground);
+//     }
+//   });
+
 
 app.get('/', (req, res) => res.render('landing'));
 
 app.get('/campgrounds', (req, res) => {
-  res.render('campgrounds', { campgrounds: campgrounds });
+  // get all campground from database
+  Campground.find({}, (err, allCamps) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render('campgrounds', { campgrounds: allCamps });
+    }
+  })
 })
 
 app.post('/campgrounds', (req, res) => {
@@ -28,10 +49,16 @@ app.post('/campgrounds', (req, res) => {
   let name = req.body.name;
   let image = req.body.image;
   let newCampground = { name: name, image: image }
-  campgrounds.push(newCampground);
 
-  //redirect to campground page
-  res.redirect('/campgrounds')
+  // create a new campground and add to database
+  Campground.create(newCampground, (err, newCamp) => {
+    if (err) {
+      console.log("SOMEthing WENT WRONG!!")
+    } else {
+      //redirect to campground page
+      res.redirect('/campgrounds')
+    }
+  })
 })
 
 app.get('/campgrounds/new', (req, res) => {
