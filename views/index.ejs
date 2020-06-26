@@ -17,9 +17,12 @@
     <div class=" col-md-4 col-sm-6">
       <div class="img-thumbnail">
         <img class="img-fluid " src="<%= campground.image %>" height="400px">
-        <div class="caption text-center">
-          <h4><%= campground.name %></h4>
+        <div class="overlay text-center">
+          <h4 class="text-capitalize"><%= campground.name %></h4>
         </div>
+        <p class="text-center">
+          <a href="/campgrounds/<%= campground._id %>" class="btn btn-secondary center">More Info</a>
+        </p>
       </div>
     </div>
     <% }); %>
