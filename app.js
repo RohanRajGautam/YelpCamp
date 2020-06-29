@@ -1,9 +1,11 @@
 const express = require("express");
+const e = require("express");
 (app = express()),
   (bodyParser = require("body-parser")),
   (port = 3000),
   (mongoose = require("mongoose")),
   (Campground = require("./models/campground")),
+  Comment = require('./models/comment'),
   (seedDB = require("./seed"));
 
 
@@ -39,7 +41,7 @@ app.get("/campgrounds", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      res.render("index", { campgrounds: allCamps });
+      res.render("campgrounds/index", { campgrounds: allCamps });
     }
   });
 });
@@ -65,7 +67,7 @@ app.post("/campgrounds", (req, res) => {
 
 //NEW - Show form to create a new campground
 app.get("/campgrounds/new", (req, res) => {
-  res.render("new");
+  res.render("campgrounds/new");
 });
 
 //SHOW - displays a particular item in the db
@@ -77,10 +79,45 @@ app.get("/campgrounds/:id", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        res.render("show", { campground: foundCampground });
+        res.render("campgrounds/show", { campground: foundCampground });
       }
     });
 });
+
+// --------------------
+// COMMENT ROUTE
+
+
+app.get('/campgrounds/:id/comments/new', (req, res) => {
+  Campground.findById(req.params.id, (err, campground) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render('comments/new', { campground: campground })
+    }
+  })
+})
+
+app.post('/campgrounds/:id/comments', (req, res) => {
+  Campground.findById(req.params.id, (err, campground) => {
+    if (err) {
+      console.log(err);
+      res.redirect('/campgrounds');
+    } else {
+      Comment.create(req.body.comment, (err, comment) => {
+        if (err) {
+          console.log(err);
+        } else {
+          campground.comments.push(comment);
+          campground.save();
+          res.redirect('/campgrounds/' + campground._id);
+        }
+      })
+
+    }
+  })
+})
+
 
 app.listen(port, () =>
   console.log(`server listening at https://localhost:${port}`)
