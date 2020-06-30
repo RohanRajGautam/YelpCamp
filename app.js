@@ -1,11 +1,12 @@
 const express = require("express");
-const e = require("express");
 (app = express()),
   (bodyParser = require("body-parser")),
   (port = 3000),
   (mongoose = require("mongoose")),
+  localStrategy = require('passport-local'),
   (Campground = require("./models/campground")),
-  Comment = require('./models/comment'),
+  User = require('./models/user')
+Comment = require('./models/comment'),
   (seedDB = require("./seed"));
 
 
