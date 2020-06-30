@@ -18,6 +18,10 @@ mongoose.connect("mongodb://localhost/yelp", {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/public'));
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+})
 seedDB();
 
 //PASSPORT CONFIGURATION
@@ -57,7 +61,7 @@ app.get("/campgrounds", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      res.render("campgrounds/index", { campgrounds: allCamps });
+      res.render("campgrounds/index", { campgrounds: allCamps, currentUser: req.user });
     }
   });
 });
