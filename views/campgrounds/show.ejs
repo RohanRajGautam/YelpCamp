@@ -12,17 +12,42 @@
     </div>
     <div class="col-md-9">
       <figure class="figure">
-        <img src="<%= campground.image %>" class="figure-img img-fluid rounded" alt="<%= campground.name %>">
+        <img
+          src="<%= campground.image %>"
+          class="figure-img img-fluid rounded"
+          alt="<%= campground.name %>"
+        />
         <h4 class="float-right">$9.00/nights</h4>
         <h4 class="fig"><a href="#"><%= campground.name %></a></h4>
         <p class="fig"><%= campground.description %></p>
-        <p class="fig"><em>Submitted by: <%= campground.author.username %></em></p>
+        <p class="fig">
+          <em>Submitted by: <%= campground.author.username %></em>
+        </p>
+
+        <% if(currentUser && campground.author.id.equals(currentUser._id)) {%>
+        <a
+          href="/campgrounds/<%= campground._id %>/edit"
+          class="btn btn-warning"
+          >Edit</a
+        >
+        <form
+          id="delete-form"
+          action="/campgrounds/<%= campground._id %>?_method=delete"
+          method="POST"
+        >
+          <button class="btn btn-danger">Delete</button>
+        </form>
+        <% } %>
       </figure>
       <div class="card card-body bg-light">
         <div class="text-right">
-          <a class="btn btn-success" href="/campgrounds/<%= campground._id %>/comments/new">Add New Comment</a>
+          <a
+            class="btn btn-success"
+            href="/campgrounds/<%= campground._id %>/comments/new"
+            >Add New Comment</a
+          >
         </div>
-        <hr>
+        <hr />
         <% campground.comments.forEach((comment)=>{ %>
         <div class="row">
           <div class="col-md-12">
@@ -36,7 +61,5 @@
     </div>
   </div>
 </div>
-
-
 
 <%- include ('../partials/footer') %>

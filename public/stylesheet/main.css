@@ -1,7 +1,11 @@
-.container{
+.container {
   margin-top: 20px;
 }
 
-.figure img{
+.figure img {
   width: 100%;
+}
+
+#delete-form {
+  display: inline;
 }
