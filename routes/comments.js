@@ -52,17 +52,23 @@ router.get(
   "/campgrounds/:id/comments/:comment_id/edit",
   middleware.checkCommentOwnership,
   (req, res) => {
-    Comment.findById(req.params.comment_id, (err, foundComment) => {
-      if (err) {
-        req.flash('error', 'Something went wrong. Please try again.')
-        res.redirect("back");
-      } else {
-        res.render("comments/edit", {
-          campground_id: req.params.id,
-          comment: foundComment,
-        });
+    Campground.findById(req.params.id, (err, foundCampground) => {
+      if (err || !foundCampground) {
+        req.flash('error', 'Something went wrong. Please try again.');
+        return res.redirect('/campgrounds')
       }
-    });
+      Comment.findById(req.params.comment_id, (err, foundComment) => {
+        if (err) {
+          req.flash('error', 'Something went wrong. Please try again.');
+          res.redirect("back");
+        } else {
+          res.render("comments/edit", {
+            campground_id: req.params.id,
+            comment: foundComment,
+          });
+        }
+      });
+    })
   }
 );
 
