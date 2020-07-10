@@ -7,7 +7,7 @@ router.get("/campgrounds", (req, res) => {
   // get all campground from database
   Campground.find({}, (err, allCamps) => {
     if (err) {
-      console.log(err);
+      req.flash('error', 'Something went wrong. Please try again.');
     } else {
       res.render("campgrounds/index", {
         campgrounds: allCamps,
@@ -37,9 +37,10 @@ router.post("/campgrounds", (req, res) => {
   // create a new campground and add to database
   Campground.create(newCampground, (err, newCamp) => {
     if (err) {
-      console.log("SOMEthing WENT WRONG!!");
+      req.flash('error', 'Something went wrong. Please try again.')
     } else {
       //redirect to campground page
+      req.flash("success", "Added new campground");
       res.redirect("/campgrounds");
     }
   });
@@ -57,7 +58,7 @@ router.get("/campgrounds/:id", (req, res) => {
     .populate("comments")
     .exec((err, foundCampground) => {
       if (err) {
-        console.log(err);
+        req.flash('error', 'Campground not found.')
       } else {
         res.render("campgrounds/show", {
           campground: foundCampground,
@@ -91,8 +92,10 @@ router.put(
       req.body.campground,
       (err, updateCampground) => {
         if (err) {
+          req.flash('error', 'Something went wrong. Please try again.')
           res.redirect("/campgrounds");
         } else {
+          req.flash('success', 'Campground updated.')
           res.redirect("/campgrounds/" + req.params.id);
         }
       }
@@ -107,8 +110,10 @@ router.delete(
   (req, res) => {
     Campground.findByIdAndRemove(req.params.id, (err) => {
       if (err) {
+        req.flash('error', 'Something went wrong. Couldn\'t delete the campground.')
         res.redirect("/campgrounds");
       } else {
+        req.flash('error', 'Campground deleted.')
         res.redirect("/campgrounds");
       }
     });
