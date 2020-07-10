@@ -3,22 +3,22 @@ const passport = require("passport");
 (app = express()),
   (bodyParser = require("body-parser")),
   (methodOverride = require("method-override")),
-  (port = 3000),
+  connectDB = require('./config/db'),
+  (port = process.env.PORT || 3000),
   (flash = require("connect-flash")),
-  (mongoose = require("mongoose")),
   (localStrategy = require("passport-local")),
   (Campground = require("./models/campground")),
   (User = require("./models/user"));
-(Comment = require("./models/comment")), (seedDB = require("./seed"));
+(Comment = require("./models/comment"));
 
 const commentRoutes = require("./routes/comments"),
   campgroundsRoutes = require("./routes/campgrounds"),
   indexRoutes = require("./routes/index");
 
-mongoose.connect("mongodb://localhost/yelp", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// CONNECT TO DATABASE
+connectDB();
+
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
@@ -55,5 +55,5 @@ app.use(campgroundsRoutes);
 app.use(indexRoutes);
 
 app.listen(port, () =>
-  console.log(`server listening at https://localhost:${port}`)
+  console.log(`Starting server at https://localhost:${port}`)
 );
