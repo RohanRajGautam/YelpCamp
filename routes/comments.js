@@ -2,21 +2,26 @@ const express = require("express");
 const router = express.Router();
 const Campground = require("../models/campground");
 const Comment = require("../models/comment");
+const middleware = require("../middleware/index");
 
 // --------------------
 // COMMENT ROUTE
 
-router.get("/campgrounds/:id/comments/new", isLoggedIn, (req, res) => {
-  Campground.findById(req.params.id, (err, campground) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("comments/new", { campground: campground });
-    }
-  });
-});
+router.get(
+  "/campgrounds/:id/comments/new",
+  middleware.isLoggedIn,
+  (req, res) => {
+    Campground.findById(req.params.id, (err, campground) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("comments/new", { campground: campground });
+      }
+    });
+  }
+);
 
-router.post("/campgrounds/:id/comments", isLoggedIn, (req, res) => {
+router.post("/campgrounds/:id/comments", middleware.isLoggedIn, (req, res) => {
   Campground.findById(req.params.id, (err, campground) => {
     if (err) {
       console.log(err);
@@ -44,7 +49,7 @@ router.post("/campgrounds/:id/comments", isLoggedIn, (req, res) => {
 
 router.get(
   "/campgrounds/:id/comments/:comment_id/edit",
-  checkCommentOwnership,
+  middleware.checkCommentOwnership,
   (req, res) => {
     Comment.findById(req.params.comment_id, (err, foundComment) => {
       if (err) {
@@ -63,7 +68,7 @@ router.get(
 
 router.put(
   "/campgrounds/:id/comments/:comment_id",
-  checkCommentOwnership,
+  middleware.checkCommentOwnership,
   (req, res) => {
     Comment.findByIdAndUpdate(
       req.params.comment_id,
@@ -83,7 +88,7 @@ router.put(
 
 router.delete(
   "/campgrounds/:id/comments/:comment_id",
-  checkCommentOwnership,
+  middleware.checkCommentOwnership,
   (req, res) => {
     Comment.findByIdAndRemove(req.params.comment_id, (err) => {
       if (err) {
@@ -94,34 +99,5 @@ router.delete(
     });
   }
 );
-
-//middleware
-function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect("/login");
-}
-
-//ownership middleware
-function checkCommentOwnership(req, res, next) {
-  // is user authenticated?
-  if (req.isAuthenticated()) {
-    Comment.findById(req.params.comment_id, (err, foundComment) => {
-      if (err) {
-        res.redirect("back");
-      } else {
-        //does user own the comment?
-        if (foundComment.author.id.equals(req.user._id)) {
-          next();
-        } else {
-          res.redirect("back");
-        }
-      }
-    });
-  } else {
-    res.redirect("back");
-  }
-}
 
 module.exports = router;
